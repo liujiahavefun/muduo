@@ -17,7 +17,7 @@ namespace muduo
 {
 
 // A barely usable WeakCallback
-
+// liujia: __GXX_EXPERIMENTAL_CXX0X__ is to let GCC chekc if -std=c++0x is in effect.
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
 
 // FIXME: support std::shared_ptr as well, maybe using template template parameters
@@ -54,6 +54,13 @@ class WeakCallback
   std::function<void (CLASS*, ARGS...)> function_;
 };
 
+//liujia: 接受两个参数，一个是类CLASS的shared_ptr对象，一个是类的成员函数指针
+//这个成员函数指针用来初始化WeakCallback的第二个参数function对象
+//构造一个函数对象，即function对象可以用下面两种方法
+//法1：function<bool(int)> f; 即这个function对象包装的“函数”或者“函数对象functor”的参数是int，返回值是bool
+//法2：template<typename F> function(F f);这个function对象的参数和返回值，与模板参数F的完全一致(也允许默认类型转换)，
+//这里的F可以是一个函数或者一个函数对象
+//参考： http://www.cnblogs.com/hujian/archive/2012/12/07/2807605.html
 template<typename CLASS, typename... ARGS>
 WeakCallback<CLASS, ARGS...> makeWeakCallback(const boost::shared_ptr<CLASS>& object,
                                               void (CLASS::*function)(ARGS...))
